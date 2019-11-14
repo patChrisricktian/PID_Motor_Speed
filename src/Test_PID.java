@@ -18,10 +18,12 @@ public class Test_PID {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+
         //int[] arrTemp = new int[]{1, 1, 1, 1, 1, 1, 0};
         //int[] arrTemp = new int[]{0, 0, 1, 1, 1, 1, 0};
         //int[] arrTemp = new int[]{0, 0, 1, 0, 0, 1, 0};
-        int[] arrTemp = new int[]{1, 0, 1, 1, 0, 1, 0};
+        //int[] arrTemp = new int[]{1, 0, 1, 1, 0, 1, 0};
+        int[] arrTemp = new int[]{0, 0, 0, 0, 0, 1, 0};
         ArrayList<Integer> arr = new ArrayList<>();
         IntStream.range(0, arrTemp.length).forEach(
                 i -> {
@@ -30,12 +32,16 @@ public class Test_PID {
         );
 
         ArrayList<Integer> listOfError = new ArrayList<>();
-        while (arr.indexOf(1) >= 0) {
+        do {
             int processValue = (int) Test_PID.sensorInputToPV(arr);
             double kSR = 0.25;
             int sizeAtATime = 8;
             double speedReduction = Test_PID.speedReduction(listOfError, kSR, sizeAtATime);
-            double pidValue = Test_PID.countPID(listOfError, 0, processValue, 1, 1, 1);
+            double kP = 0.75;
+            double kI = 2;
+            double kD = 2;
+            
+            double pidValue = Test_PID.countPID(listOfError, 0, processValue, kP, 1, 1);
             int setSPeed = 150;
             int direction = motorSpeedCalculation(listOfError, pidValue, setSPeed, speedReduction);
 
@@ -51,7 +57,8 @@ public class Test_PID {
             System.out.println("");
             
              //if (direction == -1) break;
-        }
+        //}while (arr.indexOf(1) >= 0);
+        }while (true);
 
     }
 
@@ -66,6 +73,7 @@ public class Test_PID {
      * @return 
      */
     public static int motorSpeedCalculation( ArrayList<Integer> arrError, double pidValue, int setSpeed, double speedReduction) {
+      
         if (arrError.get(arrError.size() - 1) < 0) {
             System.out.println("Moving Right");
 
@@ -87,8 +95,8 @@ public class Test_PID {
             return 0;
         }else{
             System.out.println("Moving Straight");
-            int leftSpeed = (int) (setSpeed);
-            int rightSpeed = (int) (setSpeed);
+            int leftSpeed = (int) (setSpeed) - ((int) speedReduction);
+            int rightSpeed = (int) (setSpeed) - ((int) speedReduction);
             System.out.printf("Left Speed : %d, Right Speed: %d\n", leftSpeed, rightSpeed);
             if (arrError.size() > 10) {
                 arrError.remove(0);
@@ -153,7 +161,7 @@ public class Test_PID {
             endIdx = arrError.size();
         }
         for (int i = startIdx; i < endIdx; i++) {
-            sigmaSROfN += kSR * arrError.get(i);
+            sigmaSROfN += kSR * Math.abs(arrError.get(i));
         }
         System.out.println("Speed Reduction of n : "+sigmaSROfN);
         return sigmaSROfN;
