@@ -18,8 +18,6 @@ public class Test_PID {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
-
         //int[] arrTemp = new int[]{1, 1, 1, 1, 1, 1, 0};
         //int[] arrTemp = new int[]{0, 0, 1, 1, 1, 1, 0};
         //int[] arrTemp = new int[]{0, 0, 1, 0, 0, 1, 0};
@@ -38,7 +36,7 @@ public class Test_PID {
             int sizeAtATime = 8;
             double speedReduction = Test_PID.speedReduction(listOfError, kSR, sizeAtATime);
             double pidValue = Test_PID.countPID(listOfError, 0, processValue, 1, 1, 1);
-            int setSPeed = 250;
+            int setSPeed = 150;
             int direction = motorSpeedCalculation(listOfError, pidValue, setSPeed, speedReduction);
 
             if (direction == 1) {
@@ -71,7 +69,7 @@ public class Test_PID {
         if (arrError.get(arrError.size() - 1) < 0) {
             System.out.println("Moving Right");
 
-            int leftSpeed = (int) (setSpeed + pidValue - ((int) speedReduction));
+            int leftSpeed = (int) (setSpeed - (pidValue) - ((int) speedReduction));
             int rightSpeed = (int) (setSpeed - ((int) speedReduction));
             System.out.printf("Left Speed : %d, Right Speed: %d\n", leftSpeed, rightSpeed);
             if (arrError.size() > 10) {
@@ -81,7 +79,7 @@ public class Test_PID {
         } else if(arrError.get(arrError.size() - 1) > 0 ){
             System.out.println("Moving Left");
             int leftSpeed = (int) (setSpeed - ((int) speedReduction));
-            int rightSpeed = (int) (setSpeed - pidValue - ((int) speedReduction));
+            int rightSpeed = (int) (setSpeed + (pidValue) - ((int) speedReduction));
             System.out.printf("Left Speed : %d, Right Speed: %d\n", leftSpeed, rightSpeed);
             if (arrError.size() > 10) {
                 arrError.remove(0);
@@ -157,6 +155,7 @@ public class Test_PID {
         for (int i = startIdx; i < endIdx; i++) {
             sigmaSROfN += kSR * arrError.get(i);
         }
+        System.out.println("Speed Reduction of n : "+sigmaSROfN);
         return sigmaSROfN;
     }
 
